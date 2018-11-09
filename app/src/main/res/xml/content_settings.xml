@@ -43,13 +43,11 @@
         android:title="@string/download_thumbnail_title"
         android:summary="@string/download_thumbnail_summary"/>
 
-    <ListPreference
-        android:defaultValue="@string/kiosk_page_key"
-        android:entries="@array/main_page_content_names"
-        android:entryValues="@array/main_page_content_pages"
-        android:key="@string/main_page_content_key"
-        android:title="@string/main_page_content"
-        android:summary="%s"/>
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/show_comments_key"
+        android:title="@string/show_comments_title"
+        android:summary="@string/show_comments_summary"/>
 
     <Preference
         android:summary="@string/import_data_summary"

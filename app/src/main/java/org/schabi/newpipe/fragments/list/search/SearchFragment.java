@@ -122,12 +122,11 @@ public class SearchFragment
     private String nextPageUrl;
     private String contentCountry;
     private boolean isSuggestionsEnabled = true;
-    private boolean isSearchHistoryEnabled = true;
 
-    private PublishSubject<String> suggestionPublisher = PublishSubject.create();
+    private final PublishSubject<String> suggestionPublisher = PublishSubject.create();
     private Disposable searchDisposable;
     private Disposable suggestionDisposable;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
     private SuggestionListAdapter suggestionListAdapter;
     private HistoryRecordManager historyRecordManager;
@@ -173,7 +172,7 @@ public class SearchFragment
 
         suggestionListAdapter = new SuggestionListAdapter(activity);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-        isSearchHistoryEnabled = preferences.getBoolean(getString(R.string.enable_search_history_key), true);
+        boolean isSearchHistoryEnabled = preferences.getBoolean(getString(R.string.enable_search_history_key), true);
         suggestionListAdapter.setShowSuggestionHistory(isSearchHistoryEnabled);
 
         historyRecordManager = new HistoryRecordManager(context);
@@ -365,7 +364,7 @@ public class SearchFragment
         int itemId = 0;
         boolean isFirstItem = true;
         final Context c = getContext();
-        for(String filter : service.getSearchQIHFactory().getAvailableContentFilter()) {
+        for(String filter : service.getSearchQHFactory().getAvailableContentFilter()) {
             menuItemToFilterName.put(itemId, filter);
             MenuItem item = menu.add(1,
                     itemId++,
@@ -575,8 +574,7 @@ public class SearchFragment
                                             .onNext(searchEditText.getText().toString()),
                                     throwable -> showSnackBarError(throwable,
                                             UserAction.DELETE_FROM_HISTORY, "none",
-                                            "Deleting item failed", R.string.general_error)
-                            );
+                                            "Deleting item failed", R.string.general_error));
                     disposables.add(onDelete);
                 })
                 .show();
@@ -837,7 +835,10 @@ public class SearchFragment
 
     @Override
     public void handleResult(@NonNull SearchInfo result) {
-        if (!result.getErrors().isEmpty()) {
+        final List<Throwable> exceptions = result.getErrors();
+        if (!exceptions.isEmpty()
+            && !(exceptions.size() == 1
+                && exceptions.get(0) instanceof SearchExtractor.NothingFoundException)){
             showSnackBarError(result.getErrors(), UserAction.SEARCHED,
                     NewPipe.getNameOfService(serviceId), searchString, 0);
         }
@@ -864,6 +865,7 @@ public class SearchFragment
         showListFooter(false);
         currentPageUrl = result.getNextPageUrl();
         infoListAdapter.addInfoItemList(result.getItems());
+        nextPageUrl = result.getNextPageUrl();
 
         if (!result.getErrors().isEmpty()) {
             showSnackBarError(result.getErrors(), UserAction.SEARCHED,

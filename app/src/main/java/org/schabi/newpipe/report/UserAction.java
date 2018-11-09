@@ -15,7 +15,9 @@ public enum UserAction {
     REQUESTED_CHANNEL("requested channel"),
     REQUESTED_PLAYLIST("requested playlist"),
     REQUESTED_KIOSK("requested kiosk"),
-    DELETE_FROM_HISTORY("delete from history");
+    REQUESTED_COMMENTS("requested comments"),
+    DELETE_FROM_HISTORY("delete from history"),
+    PLAY_STREAM("Play stream");
 
 
     private final String message;
